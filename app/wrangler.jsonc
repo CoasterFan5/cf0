@@ -7,6 +7,7 @@
 	"name": "cf0",
 	"compatibility_date": "2025-04-25",
 	"pages_build_output_dir": ".svelte-kit/cloudflare",
+	"compatibility_flags": ["nodejs_compat"],
 	"observability": {
 		"enabled": true
 	},
