@@ -16,9 +16,10 @@ export const actions = {
 					message: 'Passwords must match'
 				});
 			}
-			return fail(400, {
-				message: 'Passwords'
-			});
+
+			return {
+				message: 'success!'
+			};
 		}
 	)
 };
