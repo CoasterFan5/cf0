@@ -1,19 +1,40 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
+	import { goto } from '$app/navigation';
 	import Button from '$lib/components/Button.svelte';
 	import Link from '$lib/components/Link.svelte';
 	import TextInput from '$lib/components/TextInput.svelte';
+
+	let errorMessage: string | undefined = undefined;
 </script>
 
 <div class="wrap">
 	<h2>Login With Zero</h2>
 	<div class="loginForm">
 		<h3>Credentials</h3>
-		<form class="formInner">
-			<TextInput label="Name" type="text" />
-			<TextInput label="Email" type="text" />
-			<TextInput label="Password" type="password" />
-			<TextInput label="Confirm Password" type="password" />
+		<form
+			method="post"
+			action="?/new"
+			class="formInner"
+			use:enhance={() => {
+				return async ({ result, update }) => {
+					console.log(result);
+					if (result.type == 'failure') {
+						errorMessage = result.data?.message?.toString() || 'Error';
+					}
+				};
+			}}
+		>
+			<TextInput label="Name" name="name" type="text" />
+			<TextInput label="Email" name="email" type="text" />
+			<TextInput label="Password" name="pass1" type="password" />
+			<TextInput label="Confirm Password" name="pass2" type="password" />
 			<Button>Submit</Button>
+			<div class="error">
+				{#if errorMessage}
+					{errorMessage}
+				{/if}
+			</div>
 		</form>
 		<span>Have an Account? <Link href="/">Log In</Link></span>
 	</div>
@@ -59,5 +80,12 @@
 		flex-direction: column;
 		width: 100%;
 		gap: 0.5rem;
+	}
+
+	.error {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: red;
 	}
 </style>

@@ -1,10 +1,12 @@
 <script lang="ts">
 	const {
 		label,
-		type
+		type,
+		name
 	}: {
 		label?: string;
 		type: 'text' | 'password';
+		name?: string;
 	} = $props();
 
 	const id = $props.id();
@@ -15,10 +17,10 @@
 		<label for={id}>{label} </label>
 	{/if}
 	{#if type == 'text'}
-		<input {id} />
+		<input {name} {id} />
 	{/if}
 	{#if type == 'password'}
-		<input {id} />
+		<input {name} {id} />
 	{/if}
 </div>
 

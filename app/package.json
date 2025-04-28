@@ -45,7 +45,8 @@
 		"@fontsource-variable/quicksand": "^5.2.6",
 		"@libsql/client": "^0.14.0",
 		"drizzle-orm": "^0.40.0",
-		"sass-embedded": "^1.87.0"
+		"sass-embedded": "^1.87.0",
+		"zod": "^3.24.3"
 	},
 	"pnpm": {
 		"onlyBuiltDependencies": [
