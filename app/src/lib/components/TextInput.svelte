@@ -20,7 +20,7 @@
 		<input {name} {id} />
 	{/if}
 	{#if type == 'password'}
-		<input {name} {id} />
+		<input {name} {id} type="password" />
 	{/if}
 </div>
 

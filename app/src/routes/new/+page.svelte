@@ -5,7 +5,7 @@
 	import Link from '$lib/components/Link.svelte';
 	import TextInput from '$lib/components/TextInput.svelte';
 
-	let errorMessage: string | undefined = undefined;
+	let errorMessage: string | undefined = $state(undefined);
 </script>
 
 <div class="wrap">
@@ -21,6 +21,9 @@
 					console.log(result);
 					if (result.type == 'failure') {
 						errorMessage = result.data?.message?.toString() || 'Error';
+					}
+					if (result.type == 'success') {
+						goto('/onward');
 					}
 				};
 			}}

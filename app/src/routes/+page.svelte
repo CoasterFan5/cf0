@@ -1,17 +1,39 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
+	import { goto } from '$app/navigation';
 	import Button from '$lib/components/Button.svelte';
 	import Link from '$lib/components/Link.svelte';
 	import TextInput from '$lib/components/TextInput.svelte';
+
+	let errorMessage: string | undefined = $state(undefined);
 </script>
 
 <div class="wrap">
 	<h2>Login With Zero</h2>
 	<div class="loginForm">
 		<h3>Credentials</h3>
-		<form class="formInner">
-			<TextInput label="Email" type="text" />
-			<TextInput label="Password" type="password" />
+		<form
+			class="formInner"
+			method="post"
+			action="?/new"
+			use:enhance={() => {
+				return async ({ result, update }) => {
+					console.log(result);
+					if (result.type == 'failure') {
+						errorMessage = result.data?.message?.toString() || 'Error';
+					}
+					if (result.type == 'success') {
+						goto('/onward');
+					}
+				};
+			}}
+		>
+			<TextInput label="Email" type="text" name="email" />
+			<TextInput label="Password" type="password" name="pass1" />
 			<Button>Submit</Button>
+			{#if errorMessage}
+				{errorMessage}
+			{/if}
 		</form>
 		<span>No Zero Account? <Link href="/new">Create One</Link></span>
 	</div>

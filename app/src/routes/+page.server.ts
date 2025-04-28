@@ -11,18 +11,10 @@ import { z } from 'zod';
 export const actions = {
 	new: actionHelper(
 		z.object({
-			name: z.string().min(1, 'Name must be 1 letter').max(32, 'Name can only be 32 characters'),
 			email: z.string().email('Invalid Email'),
-			pass1: z.string().min(8, 'Password must be > 8 characters'),
-			pass2: z.string()
+			pass1: z.string()
 		}),
-		async ({ name, email, pass1, pass2 }, { cookies }) => {
-			if (pass1 != pass2) {
-				return fail(400, {
-					message: 'Passwords must match'
-				});
-			}
-
+		async ({ email, pass1 }, { cookies }) => {
 			const emailHash = getEmailHash(email);
 
 			const userCheck = await db
@@ -31,26 +23,21 @@ export const actions = {
 				.where(eq(usersTable.emailHash, emailHash))
 				.get();
 
-			if (userCheck) {
+			if (!userCheck) {
 				return fail(400, {
-					message: 'Email in use'
+					message: 'Invalid email or password'
 				});
 			}
 
-			const { hash, salt } = hashPass(pass1);
+			const { hash, salt } = hashPass(pass1, userCheck.salt);
 
-			const newUser = await db
-				.insert(usersTable)
-				.values({
-					name,
-					email,
-					emailHash,
-					salt,
-					hash
-				})
-				.returning();
+			if (userCheck.hash != hash) {
+				return fail(400, {
+					message: 'Invalid email or password'
+				});
+			}
 
-			const session = await generateSession(newUser[0].id);
+			const session = await generateSession(userCheck.id);
 
 			cookies.set('zero_session', session, {
 				path: '/',

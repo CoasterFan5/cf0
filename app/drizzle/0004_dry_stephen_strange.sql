@@ -1,0 +1,1 @@
+ALTER TABLE `session` ADD `ownerId` integer NOT NULL REFERENCES user(id);
