@@ -9,11 +9,13 @@
 	<div class="loginForm">
 		<h3>Credentials</h3>
 		<form class="formInner">
+			<TextInput label="Name" type="text" />
 			<TextInput label="Email" type="text" />
 			<TextInput label="Password" type="password" />
+			<TextInput label="Confirm Password" type="password" />
 			<Button>Submit</Button>
 		</form>
-		<span>No Zero Account? <Link href="/new">Create One</Link></span>
+		<span>Have an Account? <Link href="/">Log In</Link></span>
 	</div>
 </div>
 
