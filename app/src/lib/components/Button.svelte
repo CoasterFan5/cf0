@@ -1,7 +1,11 @@
 <script lang="ts">
-	import type { PageProps } from './$types';
+	import type { Snippet } from 'svelte';
 
-	const { children }: PageProps = $props();
+	const {
+		children
+	}: {
+		children?: Snippet;
+	} = $props();
 </script>
 
 <button>{@render children?.()}</button>
