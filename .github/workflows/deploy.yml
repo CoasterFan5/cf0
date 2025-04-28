@@ -13,6 +13,8 @@ jobs:
         with:
           node-version: "20"
       - run: "npm i -g pnpm"
+      - run: "pnpm install"
+        working-directory: "./app"
       - run: "pnpm run build"
         working-directory: "./app"
       - run: "npx wrangler pages deploy"
