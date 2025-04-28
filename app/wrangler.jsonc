@@ -13,8 +13,8 @@
 	"d1_databases": [
 		{
 			"binding": "db",
-			"database_name": "CF0",
-			"database_id": "cf0",
+			"database_name": "df0",
+			"database_id": "9f87329a-e911-4830-be85-620fd6250857",
 			"migrations_dir": "drizzle/migrations"
 		}
 	]
