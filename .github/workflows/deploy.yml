@@ -18,3 +18,4 @@ jobs:
       - run: "pnpm run build"
         working-directory: "./app"
       - run: "npx wrangler pages deploy"
+        working-directory: "./app"
