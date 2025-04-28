@@ -1,11 +1,11 @@
 import { actionHelper } from '$lib/server/actionHelper';
-import { db } from '$lib/server/db';
 import { usersTable } from '$lib/server/db/schema';
 import { generateSession } from '$lib/server/generateSession';
 import { getEmailHash } from '$lib/server/getEmailHash';
 import { hashPass } from '$lib/server/hashPass';
 import { fail } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/d1';
 import { z } from 'zod';
 
 export const actions = {
@@ -14,7 +14,9 @@ export const actions = {
 			email: z.string().email('Invalid Email'),
 			pass1: z.string()
 		}),
-		async ({ email, pass1 }, { cookies }) => {
+		async ({ email, pass1 }, { cookies, platform }) => {
+			const db = drizzle(platform?.env.database);
+
 			const emailHash = getEmailHash(email);
 
 			const userCheck = await db
@@ -37,7 +39,7 @@ export const actions = {
 				});
 			}
 
-			const session = await generateSession(userCheck.id);
+			const session = await generateSession(userCheck.id, platform);
 
 			cookies.set('zero_session', session, {
 				path: '/',

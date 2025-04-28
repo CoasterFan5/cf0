@@ -19,7 +19,7 @@
 		"cf-typegen": "wrangler types && mv worker-configuration.d.ts src/"
 	},
 	"devDependencies": {
-		"@cloudflare/workers-types": "^4.20250425.0",
+		"@cloudflare/vite-plugin": "^1.0.12",
 		"@eslint/compat": "^1.2.5",
 		"@eslint/js": "^9.18.0",
 		"@sveltejs/adapter-auto": "^4.0.0",
@@ -44,6 +44,7 @@
 		"@fontsource-variable/noto-sans-hanifi-rohingya": "^5.2.5",
 		"@fontsource-variable/quicksand": "^5.2.6",
 		"@libsql/client": "^0.14.0",
+		"@types/node": "^22.15.3",
 		"drizzle-orm": "^0.40.0",
 		"sass-embedded": "^1.87.0",
 		"zod": "^3.24.3"

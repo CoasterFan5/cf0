@@ -1,11 +1,11 @@
 import { actionHelper } from '$lib/server/actionHelper';
-import { db } from '$lib/server/db';
 import { usersTable } from '$lib/server/db/schema';
 import { generateSession } from '$lib/server/generateSession';
 import { getEmailHash } from '$lib/server/getEmailHash';
 import { hashPass } from '$lib/server/hashPass';
 import { fail } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/d1';
 import { z } from 'zod';
 
 export const actions = {
@@ -16,7 +16,9 @@ export const actions = {
 			pass1: z.string().min(8, 'Password must be > 8 characters'),
 			pass2: z.string()
 		}),
-		async ({ name, email, pass1, pass2 }, { cookies }) => {
+		async ({ name, email, pass1, pass2 }, { cookies, platform }) => {
+			const db = drizzle(platform?.env.database);
+
 			if (pass1 != pass2) {
 				return fail(400, {
 					message: 'Passwords must match'
@@ -50,7 +52,7 @@ export const actions = {
 				})
 				.returning();
 
-			const session = await generateSession(newUser[0].id);
+			const session = await generateSession(newUser[0].id, platform);
 
 			cookies.set('zero_session', session, {
 				path: '/',
