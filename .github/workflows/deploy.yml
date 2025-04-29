@@ -25,5 +25,6 @@ jobs:
           wranglerVersion: "4.13.2"
           command: |
             pages deploy
+            d1 migrations list database --remote
             d1 migrations apply database --remote
           workingDirectory: "./app"
