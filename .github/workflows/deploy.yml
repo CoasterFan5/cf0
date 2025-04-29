@@ -24,6 +24,6 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           wranglerVersion: "4.13.2"
           command: |
-            d1 migrations apply cf0 --preview
+            d1 migrations apply cf0 --preview --remote
             pages deploy
           workingDirectory: "./app"
