@@ -28,3 +28,4 @@ jobs:
           workingDirectory: "./app"
       - name: Migrate
         run: npx wrangler d1 migrations apply database --remote
+        working-directory: "./app"
