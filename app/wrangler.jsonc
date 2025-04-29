@@ -17,7 +17,8 @@
 			"database_name": "cf0",
 			"database_id": "9f87329a-e911-4830-be85-620fd6250857",
 			"migrations_dir": "drizzle",
-			"migrations_table": "d1_migrations"
+			"migrations_table": "d1_migrations",
+			"preview_database_id": "9c89400b-a20d-4a72-8b7b-6af1313b2d40"
 		}
 	]
 	/**
