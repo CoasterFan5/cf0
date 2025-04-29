@@ -48,9 +48,14 @@ export const actions = {
 					email,
 					emailHash,
 					salt,
-					hash
+					hash,
+					admin: process.env.NODE_ENV == 'development'
 				})
 				.returning();
+
+			if (newUser[0].admin) {
+				console.warn('Just created an admin user');
+			}
 
 			const session = await generateSession(newUser[0].id, platform);
 
