@@ -26,6 +26,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "3.51.2"
           command: pages deploy
           workingDirectory: "./app"
       - name: Migrate
@@ -34,4 +35,5 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: d1 migrations apply database --remote
+          wranglerVersion: "3.51.2"
           workingDirectory: "./app"
