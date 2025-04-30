@@ -21,7 +21,8 @@ export const sessionTable = sqliteTable('session', {
 
 export const authUrlTable = sqliteTable('apps', {
 	key: text().primaryKey(),
-	url: text().notNull()
+	url: text().notNull(),
+	tokenHash: text().notNull().default('')
 });
 
 export const authCodeTable = sqliteTable('authCodes', {

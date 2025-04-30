@@ -3,7 +3,10 @@
 	import '@fontsource-variable/quicksand';
 	import '@fontsource-variable/noto-sans-hanifi-rohingya';
 	let { children } = $props();
+	import { Toaster } from 'svelte-french-toast';
 </script>
+
+<Toaster />
 
 <div class="wrap">
 	<Navbar />

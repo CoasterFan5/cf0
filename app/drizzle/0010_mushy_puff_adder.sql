@@ -1,0 +1,1 @@
+ALTER TABLE `apps` ADD `hahs` text DEFAULT '' NOT NULL;

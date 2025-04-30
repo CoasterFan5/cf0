@@ -7,6 +7,7 @@ import crypto from 'crypto';
 import { actionHelper } from '$lib/server/actionHelper';
 import { z } from 'zod';
 import { eq } from 'drizzle-orm';
+import { authUid } from 'drizzle-orm/supabase';
 
 export const load: PageServerLoad = async ({ platform }) => {
 	const db = drizzle(platform?.env.database);
@@ -44,22 +45,97 @@ export const actions = {
 			}
 
 			const db = drizzle(platform?.env.database);
+
+			if (oldKey != newKey) {
+				const keyTest = await db
+					.select()
+					.from(authUrlTable)
+					.where(eq(authUrlTable.key, newKey))
+					.get();
+				if (keyTest) {
+					return fail(400, {
+						message: 'Duplicate Key'
+					});
+				}
+			}
+
 			try {
-				await db
+				const updated = await db
 					.update(authUrlTable)
 					.set({
 						key: newKey,
 						url: url
 					})
-					.where(eq(authUrlTable.key, oldKey));
+					.where(eq(authUrlTable.key, oldKey))
+					.returning();
+				return {
+					message: 'Updated',
+					key: updated[0].key,
+					url: updated[0].url
+				};
 			} catch (e) {
 				return fail(500, {
-					message: e
+					message: 'Erorr updating'
+				});
+			}
+		}
+	),
+	roll: actionHelper(
+		z.object({
+			key: z.string()
+		}),
+		async ({ key }, { cookies, platform }) => {
+			const user = await validateSession(cookies, platform);
+			if (!user || !user.admin) {
+				throw redirect(307, '/');
+			}
+
+			const db = drizzle(platform?.env.database);
+			const check = await db.select().from(authUrlTable).where(eq(authUrlTable.key, key)).get();
+			if (!check) {
+				return fail(400, {
+					message: 'Does not exist'
 				});
 			}
 
+			const newToken = crypto.randomBytes(32).toString('base64url');
+			const hash = crypto.hash('sha512', newToken);
+
+			await db
+				.update(authUrlTable)
+				.set({
+					tokenHash: hash
+				})
+				.where(eq(authUrlTable.key, key));
+
 			return {
-				message: 'Updated'
+				message: 'Api Token Rolled',
+				newToken
+			};
+		}
+	),
+	delete: actionHelper(
+		z.object({
+			key: z.string()
+		}),
+		async ({ key }, { cookies, platform }) => {
+			const user = await validateSession(cookies, platform);
+			if (!user || !user.admin) {
+				throw redirect(307, '/');
+			}
+
+			const db = drizzle(platform?.env.database);
+			const check = await db.select().from(authUrlTable).where(eq(authUrlTable.key, key)).get();
+			if (!check) {
+				return fail(400, {
+					message: 'Does not exist'
+				});
+			}
+
+			await db.delete(authUrlTable).where(eq(authUrlTable.key, key));
+
+			return {
+				message: 'Removed.'
 			};
 		}
 	)

@@ -3,8 +3,13 @@
 	import Button from '$lib/components/Button.svelte';
 	import Modal from '$lib/components/Modal.svelte';
 	import TextInput from '$lib/components/TextInput.svelte';
+	import { createPromiseToast, handleToastPromiseWithFormAction } from '$lib/utils/toastManager';
 	import type { PageServerData } from './$types';
 	import Fuse from 'fuse.js';
+
+	import Edit from '~icons/ph/pencil';
+	import Trash from '~icons/ph/trash-simple';
+	import Reroll from '~icons/ph/arrows-clockwise';
 
 	export const {
 		data
@@ -12,12 +17,11 @@
 		data: PageServerData;
 	} = $props();
 
-	let ogData = data.authUrls;
-	let displayedData = $state([...ogData]);
+	let displayedData = $state([...data.authUrls]);
 	let searchTerm = $state('');
 
 	$effect(() => {
-		const fuse = new Fuse(ogData, {
+		const fuse = new Fuse(data.authUrls, {
 			threshold: 0.6,
 			keys: ['key', 'url'],
 			findAllMatches: true
@@ -25,11 +29,13 @@
 		if (searchTerm) {
 			displayedData = fuse.search(searchTerm).map((i) => i.item);
 		} else {
-			displayedData = [...ogData];
+			displayedData = [...data.authUrls];
 		}
 	});
 
-	let editingKey = $state('');
+	let editingKey = $state(-1);
+	let editingType: 'edit' | 'delete' | 'reroll' = $state('edit');
+	let tempKeyValue = $state('');
 </script>
 
 <div class="wrap">
@@ -45,33 +51,116 @@
 		</div>
 	</div>
 	<div class="urls">
-		{#each displayedData as url}
-			{@const oldKey = url.key}
-			<Modal
-				open={editingKey == oldKey}
-				closeEvent={() => {
-					editingKey = '';
-				}}
-			>
-				<form class="form" method="post" action="?/edit">
-					<h2>Edit</h2>
-					<input hidden name="oldKey" value={oldKey} />
-					<TextInput label="key" name="newKey" type="text" value={url.key} />
-					<TextInput label="Url" name="url" type="text" value={url.url} />
-					<Button>Save</Button>
-				</form>
-			</Modal>
-
-			<button
-				class="url"
-				onclick={() => {
-					editingKey = url.key;
-				}}
-			>
-				<span class="name">{url.key}</span>
-				<span>{url.url} </span>
-			</button>
-		{/each}
+		{#key data.authUrls}
+			{#each displayedData as url, i}
+				<Modal
+					open={editingKey == i}
+					closeEvent={() => {
+						editingKey = -1;
+						tempKeyValue = '';
+					}}
+				>
+					{#if editingType == 'edit'}
+						<form
+							class="form"
+							method="post"
+							action="?/edit"
+							use:enhance={() => {
+								const toastManager = createPromiseToast('Updating...');
+								return async ({ result, update }) => {
+									handleToastPromiseWithFormAction(result, toastManager, {
+										redirectsAreSuccess: true,
+										redirectMessage: 'Success'
+									});
+									editingKey = -1;
+									await update();
+								};
+							}}
+						>
+							<h2>Edit</h2>
+							<input hidden name="oldKey" value={url.key} />
+							<TextInput label="key" name="newKey" type="text" value={url.key} />
+							<TextInput label="Url" name="url" type="text" value={url.url} />
+							<Button>Save</Button>
+						</form>
+					{:else if editingType == 'reroll'}
+						<form
+							class="form"
+							method="post"
+							action="?/roll"
+							use:enhance={() => {
+								const toastManager = createPromiseToast('Rolling token...');
+								return async ({ result, update }) => {
+									handleToastPromiseWithFormAction(result, toastManager);
+									if (result.type == 'success') {
+										tempKeyValue = result?.data?.newToken?.toString() || '';
+									}
+									await update();
+								};
+							}}
+						>
+							<h2>Roll Key</h2>
+							<input hidden name="key" value={url.key} />
+							<TextInput label="Token will show here" value={tempKeyValue} type="text" />
+							<Button>Roll Key</Button>
+						</form>
+					{:else if editingType == 'delete'}
+						<form
+							class="form"
+							method="post"
+							action="?/delete"
+							use:enhance={() => {
+								const toastManager = createPromiseToast('Removing');
+								return async ({ result, update }) => {
+									handleToastPromiseWithFormAction(result, toastManager);
+									await update();
+									editingKey = -1;
+								};
+							}}
+						>
+							<h2>Delete</h2>
+							<input hidden name="key" value={url.key} />
+							<Button>Delete</Button>
+						</form>
+					{/if}
+				</Modal>
+				<div class="url">
+					<div>
+						<span class="name">{url.key}</span>
+						<span class="u">{url.url} </span>
+					</div>
+					<div class="actions">
+						<button
+							class="actionButton"
+							onclick={() => {
+								editingType = 'edit';
+								editingKey = i;
+							}}
+						>
+							<Edit /></button
+						>
+						<button
+							class="actionButton"
+							onclick={() => {
+								editingType = 'reroll';
+								editingKey = i;
+							}}
+						>
+							<Reroll /></button
+						>
+						<button
+							class="actionButton"
+							onclick={() => {
+								editingType = 'delete';
+								editingKey = i;
+							}}
+						>
+							<Trash /></button
+						>
+					</div>
+				</div>
+			{/each}
+		{/key}
 	</div>
 </div>
 
@@ -115,7 +204,7 @@
 	.url {
 		border: 0px;
 		outline: 0px;
-		cursor: pointer;
+
 		background: rgba(0, 0, 0, 0.1);
 		padding: 0.75rem;
 		max-width: 50rem;
@@ -129,6 +218,10 @@
 		.name {
 			font-weight: 500;
 		}
+
+		.u {
+			opacity: 0.7;
+		}
 	}
 
 	.form {
@@ -137,5 +230,29 @@
 		align-items: start;
 		justify-content: start;
 		gap: 0.5rem;
+	}
+
+	.actions {
+		display: flex;
+		flex-direction: row;
+		gap: 0.25rem;
+	}
+
+	.actionButton {
+		outline: 0px;
+		border: 0px;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 100%;
+		padding: 0.25rem;
+		background: transparent;
+		transition: all cubic-bezier(0.19, 1, 0.22, 1) 0.5s;
+
+		&:hover {
+			background: var(--accent);
+			color: var(--background);
+		}
 	}
 </style>
