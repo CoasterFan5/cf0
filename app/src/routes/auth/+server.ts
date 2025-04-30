@@ -4,7 +4,7 @@ import { error, redirect } from '@sveltejs/kit';
 import { authCodeTable, authUrlTable } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 
-export const GET: RequestHandler = async ({ url, cookies, platform }) => {
+export const GET: RequestHandler = async ({ url, platform }) => {
 	const appName = url.searchParams.get('u');
 	if (!appName) {
 		return error(400, 'No url id specified');
@@ -17,5 +17,9 @@ export const GET: RequestHandler = async ({ url, cookies, platform }) => {
 		return error(400, 'Invalid url id specified');
 	}
 
-	throw redirect(307, `/onward?u=appName}`);
+	return new Response(`<meta http-equiv="refresh" content="0; url=/auth/onward?u=${appName}" />`, {
+		headers: {
+			'Content-Type': 'text/html; charset=utf-8'
+		}
+	});
 };

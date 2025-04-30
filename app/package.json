@@ -46,6 +46,7 @@
 		"@libsql/client": "^0.14.0",
 		"@types/node": "^22.15.3",
 		"drizzle-orm": "^0.40.0",
+		"fuse.js": "^7.1.0",
 		"sass-embedded": "^1.87.0",
 		"zod": "^3.24.3"
 	},

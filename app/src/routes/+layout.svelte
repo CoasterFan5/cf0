@@ -15,7 +15,7 @@
 		--text: #000000;
 		--textLight: #2f3e46;
 		--background: #f1f1f1;
-		margin: 0px;
+		--accent: #393a3f;
 		padding: 0px;
 		color: var(--text);
 	}
