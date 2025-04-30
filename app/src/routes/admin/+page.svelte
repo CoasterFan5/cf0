@@ -1,5 +1,8 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import Button from '$lib/components/Button.svelte';
+	import Modal from '$lib/components/Modal.svelte';
+	import TextInput from '$lib/components/TextInput.svelte';
 	import type { PageServerData } from './$types';
 	import Fuse from 'fuse.js';
 
@@ -12,19 +15,21 @@
 	let ogData = data.authUrls;
 	let displayedData = $state([...ogData]);
 	let searchTerm = $state('');
-	const fuse = new Fuse(ogData, {
-		threshold: 0.6,
-		keys: ['key', 'url'],
-		findAllMatches: true
-	});
 
 	$effect(() => {
+		const fuse = new Fuse(ogData, {
+			threshold: 0.6,
+			keys: ['key', 'url'],
+			findAllMatches: true
+		});
 		if (searchTerm) {
 			displayedData = fuse.search(searchTerm).map((i) => i.item);
 		} else {
 			displayedData = [...ogData];
 		}
 	});
+
+	let editingKey = $state('');
 </script>
 
 <div class="wrap">
@@ -41,10 +46,31 @@
 	</div>
 	<div class="urls">
 		{#each displayedData as url}
-			<div class="url">
+			{@const oldKey = url.key}
+			<Modal
+				open={editingKey == oldKey}
+				closeEvent={() => {
+					editingKey = '';
+				}}
+			>
+				<form class="form" method="post" action="?/edit">
+					<h2>Edit</h2>
+					<input hidden name="oldKey" value={oldKey} />
+					<TextInput label="key" name="newKey" type="text" value={url.key} />
+					<TextInput label="Url" name="url" type="text" value={url.url} />
+					<Button>Save</Button>
+				</form>
+			</Modal>
+
+			<button
+				class="url"
+				onclick={() => {
+					editingKey = url.key;
+				}}
+			>
 				<span class="name">{url.key}</span>
 				<span>{url.url} </span>
-			</div>
+			</button>
 		{/each}
 	</div>
 </div>
@@ -87,6 +113,9 @@
 	}
 
 	.url {
+		border: 0px;
+		outline: 0px;
+		cursor: pointer;
 		background: rgba(0, 0, 0, 0.1);
 		padding: 0.75rem;
 		max-width: 50rem;
@@ -100,5 +129,13 @@
 		.name {
 			font-weight: 500;
 		}
+	}
+
+	.form {
+		display: flex;
+		flex-direction: column;
+		align-items: start;
+		justify-content: start;
+		gap: 0.5rem;
 	}
 </style>

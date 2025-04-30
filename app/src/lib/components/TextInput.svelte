@@ -1,12 +1,14 @@
 <script lang="ts">
-	const {
+	let {
 		label,
 		type,
-		name
+		name,
+		value = $bindable('')
 	}: {
 		label?: string;
 		type: 'text' | 'password';
 		name?: string;
+		value?: string;
 	} = $props();
 
 	const id = $props.id();
@@ -17,14 +19,20 @@
 		<label for={id}>{label} </label>
 	{/if}
 	{#if type == 'text'}
-		<input {name} {id} />
+		<input {name} {id} bind:value />
 	{/if}
 	{#if type == 'password'}
-		<input {name} {id} type="password" />
+		<input {name} {id} type="password" bind:value />
 	{/if}
 </div>
 
 <style lang="scss">
+	div {
+		display: flex;
+		flex-direction: column;
+		align-items: start;
+	}
+
 	label {
 		width: 100%;
 		text-align: left;
