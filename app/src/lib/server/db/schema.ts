@@ -19,13 +19,23 @@ export const sessionTable = sqliteTable('session', {
 		.references(() => usersTable.id)
 });
 
-export const authUrlTable = sqliteTable('apps', {
+export const authUrlTable = sqliteTable('authUrls', {
 	key: text().primaryKey(),
 	url: text().notNull(),
 	tokenHash: text().notNull().default('')
 });
 
 export const authCodeTable = sqliteTable('authCodes', {
+	key: text().primaryKey(),
+	ownerId: integer()
+		.notNull()
+		.references(() => usersTable.id),
+	urlKey: text()
+		.notNull()
+		.references(() => authUrlTable.key)
+});
+
+export const authTokensTable = sqliteTable('authTokens', {
 	key: text().primaryKey(),
 	ownerId: integer()
 		.notNull()

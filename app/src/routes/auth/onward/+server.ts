@@ -21,11 +21,16 @@ export const GET: RequestHandler = async ({ url, cookies, platform }) => {
 	const db = drizzle(platform?.env.database);
 	const app = await db.select().from(authUrlTable).where(eq(authUrlTable.key, appName)).get();
 
+	if (!app) {
+		return error(400, 'Invalid App Id');
+	}
+
 	const code = await db
 		.insert(authCodeTable)
 		.values({
 			key: crypto.randomBytes(32).toString('base64url'),
-			ownerId: user.id
+			ownerId: user.id,
+			urlKey: app?.key
 		})
 		.returning();
 
@@ -34,7 +39,7 @@ export const GET: RequestHandler = async ({ url, cookies, platform }) => {
 	}
 
 	const rUrl = new URL(app.url);
-	rUrl.searchParams.set('token', code[0].key);
+	rUrl.searchParams.set('code', code[0].key);
 
 	throw redirect(307, rUrl);
 };

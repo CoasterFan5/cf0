@@ -1,20 +1,10 @@
-import { drizzle } from 'drizzle-orm/d1';
 import type { RequestHandler } from './$types';
 import { error, redirect } from '@sveltejs/kit';
-import { authCodeTable, authUrlTable } from '$lib/server/db/schema';
-import { eq } from 'drizzle-orm';
 
-export const GET: RequestHandler = async ({ url, platform }) => {
+export const GET: RequestHandler = async ({ url }) => {
 	const appName = url.searchParams.get('u');
 	if (!appName) {
 		return error(400, 'No url id specified');
-	}
-
-	const db = drizzle(platform?.env.database);
-	const app = await db.select().from(authUrlTable).where(eq(authUrlTable.key, appName)).get();
-
-	if (!app) {
-		return error(400, 'Invalid url id specified');
 	}
 
 	return new Response(`<meta http-equiv="refresh" content="0; url=/auth/onward?u=${appName}" />`, {
