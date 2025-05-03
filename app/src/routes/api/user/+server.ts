@@ -46,6 +46,7 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 
 	return new Response(
 		JSON.stringify({
+			id: user.emailHash,
 			name: user.name,
 			email: user.email,
 			admin: user.admin
