@@ -75,7 +75,7 @@ export const actions = {
 				};
 			} catch (e) {
 				return fail(500, {
-					message: 'Erorr updating'
+					message: 'Error updating'
 				});
 			}
 		}
