@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import Button from '$lib/components/Button.svelte';
 	import Link from '$lib/components/Link.svelte';
 	import TextInput from '$lib/components/TextInput.svelte';
 
 	let errorMessage: string | undefined = $state(undefined);
+	let appId = $derived(page.url.searchParams.get('u'));
 </script>
 
 <div class="wrap">
@@ -23,7 +25,11 @@
 						errorMessage = result.data?.message?.toString() || 'Error';
 					}
 					if (result.type == 'success') {
-						goto('/onward');
+						if (appId) {
+							goto(`/auth?u=${appId}`);
+						} else {
+							goto('/onward');
+						}
 					}
 				};
 			}}
@@ -35,7 +41,14 @@
 				{errorMessage}
 			{/if}
 		</form>
-		<span>No Zero Account? <Link href="/new">Create One</Link></span>
+		<span
+			>No Zero Account?
+			{#if appId}
+				<Link href="/new?u={appId}">Create One</Link>
+			{:else}
+				<Link href="/new">Create One</Link>
+			{/if}
+		</span>
 	</div>
 </div>
 

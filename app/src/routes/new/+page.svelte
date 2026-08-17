@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import Button from '$lib/components/Button.svelte';
 	import Link from '$lib/components/Link.svelte';
 	import TextInput from '$lib/components/TextInput.svelte';
@@ -23,7 +24,12 @@
 						errorMessage = result.data?.message?.toString() || 'Error';
 					}
 					if (result.type == 'success') {
-						goto('/onward');
+						const appId = page.url.searchParams.get('u');
+						if (appId) {
+							goto(`/auth?u=${appId}`);
+						} else {
+							goto('/onward');
+						}
 					}
 				};
 			}}
