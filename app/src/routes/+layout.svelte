@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Navbar from '$lib/components/Navbar.svelte';
 	import '@fontsource-variable/quicksand';
 	import '@fontsource-variable/noto-sans-hanifi-rohingya';
 	let { children } = $props();
@@ -8,10 +7,7 @@
 
 <Toaster />
 
-<div class="wrap">
-	<Navbar />
-	{@render children?.()}
-</div>
+{@render children?.()}
 
 <style lang="scss">
 	:global(body) {
@@ -20,6 +16,7 @@
 		--background: #f1f1f1;
 		--accent: #393a3f;
 		padding: 0px;
+		margin: 0;
 		color: var(--text);
 	}
 	:global(*) {

@@ -28,7 +28,7 @@
 						if (appId) {
 							goto(`/auth?u=${appId}`);
 						} else {
-							goto('/onward');
+							goto('/dashboard');
 						}
 					}
 				};

@@ -10,6 +10,7 @@
 		background: white;
 		padding: 1rem;
 		border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+		margin: 0;
 
 		a {
 			color: var(--text);
@@ -19,6 +20,7 @@
 			h1 {
 				font-weight: 400;
 				margin: 0;
+				font-size: 1.2rem;
 			}
 		}
 	}
