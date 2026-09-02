@@ -9,47 +9,47 @@ import { drizzle } from 'drizzle-orm/d1';
 import { z } from 'zod';
 
 export const actions = {
-	new: actionHelper(
-		z.object({
-			email: z.string().email('Invalid Email'),
-			pass1: z.string()
-		}),
-		async ({ email, pass1 }, { cookies, platform }) => {
-			const db = drizzle(platform?.env.database);
+  new: actionHelper(
+    z.object({
+      email: z.string().email('Invalid Email'),
+      pass1: z.string()
+    }),
+    async ({ email, pass1 }, { cookies, platform }) => {
+      const db = drizzle(platform?.env.database);
 
-			const emailHash = getEmailHash(email);
+      const emailHash = getEmailHash(email);
 
-			const userCheck = await db
-				.select()
-				.from(usersTable)
-				.where(eq(usersTable.emailHash, emailHash))
-				.get();
+      const userCheck = await db
+        .select()
+        .from(usersTable)
+        .where(eq(usersTable.emailHash, emailHash))
+        .get();
 
-			if (!userCheck) {
-				return fail(400, {
-					message: 'Invalid email or password'
-				});
-			}
+      if (!userCheck) {
+        return fail(400, {
+          message: 'Invalid email or password'
+        });
+      }
 
-			const { hash, salt } = hashPass(pass1, userCheck.salt);
+      const { hash, salt } = hashPass(pass1, userCheck.salt);
 
-			if (userCheck.hash != hash) {
-				return fail(400, {
-					message: 'Invalid email or password'
-				});
-			}
+      if (userCheck.hash != hash) {
+        return fail(400, {
+          message: 'Invalid email or password'
+        });
+      }
 
-			const session = await generateSession(userCheck.id, platform);
+      const session = await generateSession(userCheck.id, platform);
 
-			cookies.set('zero_session', session, {
-				path: '/',
-				secure: true,
-				sameSite: 'strict'
-			});
+      cookies.set('zero_session', session, {
+        path: '/',
+        secure: true,
+        sameSite: 'lax'
+      });
 
-			return {
-				message: 'success!'
-			};
-		}
-	)
+      return {
+        message: 'success!'
+      };
+    }
+  )
 };
